@@ -20,7 +20,18 @@ cd farm_ui
 npm install
 ```
 
-### 3. Run the app
+### 3. Configure environment (optional)
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+
+Edit `.env` to set the backend URL:
+```env
+VITE_API_URL=http://localhost:5000
+```
+
+### 4. Run the app
 ```bash
 npm run dev
 ```

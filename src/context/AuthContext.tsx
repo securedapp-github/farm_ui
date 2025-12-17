@@ -34,8 +34,8 @@ interface RegisterData {
 // Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// API base URL
-const API_BASE = 'http://localhost:5000';
+// API base URL - uses environment variable or defaults to localhost
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // Provider component
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {

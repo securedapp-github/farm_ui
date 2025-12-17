@@ -9,7 +9,7 @@ import type {
     BatchEvent
 } from './types';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // Safe localStorage wrapper to handle blocked storage
 function safeGetItem(key: string): string | null {
