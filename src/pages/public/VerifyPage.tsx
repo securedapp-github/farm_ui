@@ -419,24 +419,6 @@ const VerifyPage = () => {
                                     <h3 className="section-title">Product Journey</h3>
                                     <p className="section-desc">Complete journey from farm to your hands including all custody transfers</p>
 
-                                    {/* Parent Batch Info - if this is a child batch */}
-                                    {data.parentBatch && (
-                                        <div style={{ marginBottom: '24px', padding: '16px', background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', borderRadius: '12px', border: '1px solid #bae6fd' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '13px', color: '#0369a1' }}>
-                                                <GitBranch size={16} />
-                                                Split from Parent Batch
-                                            </div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <div>
-                                                    <span className="font-mono" style={{ fontSize: '12px', color: '#0369a1' }}>{data.parentBatch.batchId}</span>
-                                                    <h5 style={{ margin: '4px 0', color: '#0c4a6e' }}>{data.parentBatch.productName}</h5>
-                                                </div>
-                                                <div style={{ textAlign: 'right' }}>
-                                                    <span style={{ fontSize: '18px', fontWeight: 600, color: '#0369a1' }}>{data.parentBatch.weight} {data.parentBatch.weightUnit}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
 
                                     {/* Unified Timeline - Chronologically sorted */}
                                     <div className="journey-timeline">
