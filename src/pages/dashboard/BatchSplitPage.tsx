@@ -45,6 +45,11 @@ const BatchSplitPage = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [createdBatches, setCreatedBatches] = useState<{ id: string; batchId: string; weight: number }[]>([]);
 
+    // Quick Split state
+    const [quickSplitBags, setQuickSplitBags] = useState<number>(2);
+    const [quickSplitWeight, setQuickSplitWeight] = useState<number>(10);
+    const [commonLocation, setCommonLocation] = useState<string>('');
+
     useEffect(() => {
         const loadBatch = async () => {
             if (!id) return;
@@ -111,6 +116,27 @@ const BatchSplitPage = () => {
         })));
     };
 
+    // Quick Split - generate batches based on number of bags and weight per bag
+    const generateQuickSplit = () => {
+        if (!parentBatch) return;
+        const totalQuickWeight = quickSplitBags * quickSplitWeight;
+        if (totalQuickWeight > parentBatch.totalWeight) {
+            setErrors({ total: `Total (${totalQuickWeight} ${parentBatch.unit}) exceeds available weight (${parentBatch.totalWeight} ${parentBatch.unit})` });
+            return;
+        }
+        const newBatches: ChildBatch[] = [];
+        for (let i = 0; i < quickSplitBags; i++) {
+            newBatches.push({
+                id: Date.now().toString() + i,
+                weight: quickSplitWeight,
+                destination: '',
+                notes: `Bag ${i + 1} of ${quickSplitBags}`
+            });
+        }
+        setChildBatches(newBatches);
+        setErrors({});
+    };
+
     const validate = () => {
         if (!parentBatch) return false;
         const newErrors: Record<string, string> = {};
@@ -123,8 +149,9 @@ const BatchSplitPage = () => {
             if (!batch.weight || batch.weight <= 0) {
                 newErrors[`${batch.id}-weight`] = 'Weight is required';
             }
-            if (!batch.destination.trim()) {
-                newErrors[`${batch.id}-destination`] = 'Destination is required';
+            // Destination is valid if batch has one OR if commonLocation is provided
+            if (!batch.destination.trim() && !commonLocation.trim()) {
+                newErrors[`${batch.id}-destination`] = 'Destination or Common Location is required';
             }
         });
 
@@ -145,7 +172,7 @@ const BatchSplitPage = () => {
                 id,
                 childBatches.map(batch => ({
                     weight: batch.weight,
-                    destination: batch.destination
+                    destination: batch.destination || commonLocation // Use common location if batch destination is empty
                 }))
             );
 
@@ -263,6 +290,100 @@ const BatchSplitPage = () => {
                         <button type="button" className="btn btn-ghost btn-sm" onClick={distributeEvenly}>
                             Distribute Evenly
                         </button>
+                    </div>
+
+                    {/* Quick Split Section */}
+                    <div style={{
+                        marginBottom: '20px',
+                        padding: '16px',
+                        background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
+                        borderRadius: '12px',
+                        border: '1px solid #86efac'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#166534', fontWeight: 600 }}>
+                            <Package size={18} />
+                            Quick Split
+                        </div>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                            <div style={{ flex: 1, minWidth: '120px' }}>
+                                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>Number of Bags</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="50"
+                                    value={quickSplitBags}
+                                    onChange={(e) => setQuickSplitBags(Math.max(1, parseInt(e.target.value) || 1))}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 12px',
+                                        borderRadius: '8px',
+                                        border: '1px solid #d1d5db',
+                                        fontSize: '16px',
+                                        fontWeight: 600
+                                    }}
+                                />
+                            </div>
+                            <div style={{ flex: 1, minWidth: '120px' }}>
+                                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>Weight per Bag ({parentBatch.unit})</label>
+                                <input
+                                    type="number"
+                                    min="0.1"
+                                    step="0.1"
+                                    value={quickSplitWeight}
+                                    onChange={(e) => setQuickSplitWeight(Math.max(0.1, parseFloat(e.target.value) || 0.1))}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 12px',
+                                        borderRadius: '8px',
+                                        border: '1px solid #d1d5db',
+                                        fontSize: '16px',
+                                        fontWeight: 600
+                                    }}
+                                />
+                            </div>
+                            <div style={{ minWidth: '100px', textAlign: 'center' }}>
+                                <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Total</div>
+                                <div style={{ fontSize: '18px', fontWeight: 700, color: quickSplitBags * quickSplitWeight > parentBatch.totalWeight ? '#dc2626' : '#059669' }}>
+                                    {quickSplitBags * quickSplitWeight} {parentBatch.unit}
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={generateQuickSplit}
+                                disabled={quickSplitBags * quickSplitWeight > parentBatch.totalWeight}
+                                style={{ minWidth: '140px' }}
+                            >
+                                Generate {quickSplitBags} Bags
+                            </button>
+                        </div>
+
+                        {/* Common Location for all splits */}
+                        <div style={{ marginTop: '12px' }}>
+                            <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>
+                                Common Location (applies to all splits)
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="e.g., Mumbai Warehouse"
+                                value={commonLocation}
+                                onChange={(e) => setCommonLocation(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    borderRadius: '8px',
+                                    border: '1px solid #d1d5db',
+                                    fontSize: '14px'
+                                }}
+                            />
+                        </div>
+
+                        {quickSplitBags * quickSplitWeight > parentBatch.totalWeight && (
+                            <div style={{ marginTop: '8px', fontSize: '12px', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <AlertTriangle size={14} />
+                                Exceeds available weight ({parentBatch.totalWeight} {parentBatch.unit})
+                            </div>
+                        )}
                     </div>
 
                     <div className="dist-bar">

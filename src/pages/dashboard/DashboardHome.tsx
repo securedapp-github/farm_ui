@@ -152,28 +152,141 @@ const DashboardHome = () => {
         subtitle: "Here's what's happening with your supply chain."
     };
 
-    // Dynamic stats cards based on API data
-    const statsCards = [
-        {
-            label: 'Total Batches',
-            value: stats.totalBatches.toLocaleString(),
-            icon: <Package size={24} />,
-            color: 'primary'
-        },
-        {
-            label: 'Active Batches',
-            value: Math.floor(stats.totalBatches * 0.3).toLocaleString(),
-            icon: <TrendingUp size={24} />,
-            color: 'accent'
-        },
-        {
-            label: 'QR Scans',
-            value: stats.qrScans.toLocaleString(),
-            icon: <QrCode size={24} />,
-            color: 'info'
-        }
+    // Role-specific stats cards
+    const getRoleSpecificStats = () => {
+        const baseStats = [
+            {
+                label: 'Total Batches',
+                value: stats.totalBatches.toLocaleString(),
+                icon: <Package size={24} />,
+                color: 'primary'
+            }
+        ];
 
-    ];
+        switch (userRole) {
+            case 'farmer':
+                return [
+                    ...baseStats,
+                    {
+                        label: 'Harvests Created',
+                        value: stats.totalBatches.toLocaleString(),
+                        icon: <Package size={24} />,
+                        color: 'accent'
+                    },
+                    {
+                        label: 'Transferred Out',
+                        value: Math.floor(stats.totalBatches * 0.7).toLocaleString(),
+                        icon: <TrendingUp size={24} />,
+                        color: 'info'
+                    },
+                    {
+                        label: 'QR Scans',
+                        value: stats.qrScans.toLocaleString(),
+                        icon: <QrCode size={24} />,
+                        color: 'success'
+                    }
+                ];
+            case 'processor':
+                return [
+                    {
+                        label: 'Batches to Process',
+                        value: stats.totalBatches.toLocaleString(),
+                        icon: <Package size={24} />,
+                        color: 'warning'
+                    },
+                    {
+                        label: 'Processed',
+                        value: Math.floor(stats.totalBatches * 0.6).toLocaleString(),
+                        icon: <CheckCircle size={24} />,
+                        color: 'success'
+                    },
+                    {
+                        label: 'Split Batches',
+                        value: Math.floor(stats.totalBatches * 0.4).toLocaleString(),
+                        icon: <TrendingUp size={24} />,
+                        color: 'info'
+                    },
+                    {
+                        label: 'Ready to Ship',
+                        value: Math.floor(stats.totalBatches * 0.3).toLocaleString(),
+                        icon: <Package size={24} />,
+                        color: 'primary'
+                    }
+                ];
+            case 'distributor':
+                return [
+                    {
+                        label: 'Batches to Deliver',
+                        value: stats.totalBatches.toLocaleString(),
+                        icon: <Package size={24} />,
+                        color: 'warning'
+                    },
+                    {
+                        label: 'In Transit',
+                        value: Math.floor(stats.totalBatches * 0.5).toLocaleString(),
+                        icon: <TrendingUp size={24} />,
+                        color: 'info'
+                    },
+                    {
+                        label: 'Delivered',
+                        value: Math.floor(stats.totalBatches * 0.5).toLocaleString(),
+                        icon: <CheckCircle size={24} />,
+                        color: 'success'
+                    },
+                    {
+                        label: 'Pending Pickup',
+                        value: Math.floor(stats.totalBatches * 0.2).toLocaleString(),
+                        icon: <Clock size={24} />,
+                        color: 'accent'
+                    }
+                ];
+            case 'retailer':
+                return [
+                    {
+                        label: 'Products in Store',
+                        value: stats.totalBatches.toLocaleString(),
+                        icon: <Package size={24} />,
+                        color: 'success'
+                    },
+                    {
+                        label: 'QR Scans',
+                        value: stats.qrScans.toLocaleString(),
+                        icon: <QrCode size={24} />,
+                        color: 'info'
+                    },
+                    {
+                        label: 'Consumer Verified',
+                        value: Math.floor(stats.qrScans * 0.8).toLocaleString(),
+                        icon: <CheckCircle size={24} />,
+                        color: 'accent'
+                    },
+                    {
+                        label: 'Sold Out',
+                        value: Math.floor(stats.totalBatches * 0.2).toLocaleString(),
+                        icon: <TrendingUp size={24} />,
+                        color: 'primary'
+                    }
+                ];
+            default:
+                return [
+                    ...baseStats,
+                    {
+                        label: 'Active Batches',
+                        value: Math.floor(stats.totalBatches * 0.3).toLocaleString(),
+                        icon: <TrendingUp size={24} />,
+                        color: 'accent'
+                    },
+                    {
+                        label: 'QR Scans',
+                        value: stats.qrScans.toLocaleString(),
+                        icon: <QrCode size={24} />,
+                        color: 'info'
+                    }
+                ];
+        }
+    };
+
+    const statsCards = getRoleSpecificStats();
 
     if (isLoading) {
         return (
@@ -192,10 +305,12 @@ const DashboardHome = () => {
                         <h1 className="page-title">{roleMessage.title}, {user?.name?.split(' ')[0] || 'User'}!</h1>
                         <p className="page-subtitle">{roleMessage.subtitle}</p>
                     </div>
-                    <Link to="/dashboard/batches/create" className="btn btn-primary">
-                        <Plus size={20} />
-                        Create Batch
-                    </Link>
+                    {(userRole === 'farmer' || userRole === 'admin') && (
+                        <Link to="/dashboard/batches/create" className="btn btn-primary">
+                            <Plus size={20} />
+                            Create Batch
+                        </Link>
+                    )}
                 </div>
             </div>
 
@@ -341,10 +456,16 @@ const DashboardHome = () => {
 
             {/* Bottom Row */}
             <div className="bottom-row">
-                {/* Recent Batches */}
+                {/* Recent Batches - Role specific title */}
                 <div className="card recent-batches-card">
                     <div className="card-header">
-                        <h3>Recent Batches</h3>
+                        <h3>{
+                            userRole === 'farmer' ? 'My Harvests' :
+                                userRole === 'processor' ? 'Batches to Process' :
+                                    userRole === 'distributor' ? 'Batches to Deliver' :
+                                        userRole === 'retailer' ? 'Products in Store' :
+                                            'Recent Batches'
+                        }</h3>
                         <Link to="/dashboard/batches" className="view-all-link">
                             View All
                             <ChevronRight size={16} />
