@@ -6,6 +6,8 @@ import LandingPage from './pages/public/LandingPage';
 import LoginPage from './pages/public/LoginPage';
 import RegisterPage from './pages/public/RegisterPage';
 import VerifyPage from './pages/public/VerifyPage';
+import ForgotPasswordPage from './pages/public/ForgotPasswordPage';
+import ResetPasswordPage from './pages/public/ResetPasswordPage';
 
 // Dashboard Layout
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -34,6 +36,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify" element={<VerifyPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<DashboardLayout />}>
