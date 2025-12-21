@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import './AuthPages.css';
 
 const roles = [
+    { value: 'admin', label: 'Admin', icon: '🛡️', desc: 'System administrator' },
     { value: 'farmer', label: 'Farmer', icon: '🌾', desc: 'I grow and harvest crops' },
     { value: 'processor', label: 'Processor', icon: '🏭', desc: 'I process raw materials' },
     { value: 'distributor', label: 'Distributor', icon: '🚚', desc: 'I transport and distribute' },
@@ -67,12 +68,15 @@ const RegisterPage = () => {
             newErrors.email = 'Please enter a valid email';
         }
 
-        if (!formData.organization.trim()) {
-            newErrors.organization = 'Organization name is required';
-        }
+        // Organization and location are optional for admin
+        if (formData.role !== 'admin') {
+            if (!formData.organization.trim()) {
+                newErrors.organization = 'Organization name is required';
+            }
 
-        if (!formData.location.trim()) {
-            newErrors.location = 'Location is required';
+            if (!formData.location.trim()) {
+                newErrors.location = 'Location is required';
+            }
         }
 
         if (!formData.password) {
@@ -268,39 +272,43 @@ const RegisterPage = () => {
                                         {errors.email && <span className="input-error-text">{errors.email}</span>}
                                     </div>
 
-                                    <div className="input-group">
-                                        <label className="input-label" htmlFor="organization">Organization Name</label>
-                                        <div className="input-with-icon">
-                                            <Building2 size={20} className="input-icon" />
-                                            <input
-                                                type="text"
-                                                id="organization"
-                                                name="organization"
-                                                className={`input input-icon-left ${errors.organization ? 'input-error' : ''}`}
-                                                placeholder="Your Farm / Company Name"
-                                                value={formData.organization}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                        {errors.organization && <span className="input-error-text">{errors.organization}</span>}
-                                    </div>
+                                    {formData.role !== 'admin' && (
+                                        <>
+                                            <div className="input-group">
+                                                <label className="input-label" htmlFor="organization">Organization Name</label>
+                                                <div className="input-with-icon">
+                                                    <Building2 size={20} className="input-icon" />
+                                                    <input
+                                                        type="text"
+                                                        id="organization"
+                                                        name="organization"
+                                                        className={`input input-icon-left ${errors.organization ? 'input-error' : ''}`}
+                                                        placeholder="Your Farm / Company Name"
+                                                        value={formData.organization}
+                                                        onChange={handleChange}
+                                                    />
+                                                </div>
+                                                {errors.organization && <span className="input-error-text">{errors.organization}</span>}
+                                            </div>
 
-                                    <div className="input-group">
-                                        <label className="input-label" htmlFor="location">Location</label>
-                                        <div className="input-with-icon">
-                                            <MapPin size={20} className="input-icon" />
-                                            <input
-                                                type="text"
-                                                id="location"
-                                                name="location"
-                                                className={`input input-icon-left ${errors.location ? 'input-error' : ''}`}
-                                                placeholder="City, State/Province"
-                                                value={formData.location}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                        {errors.location && <span className="input-error-text">{errors.location}</span>}
-                                    </div>
+                                            <div className="input-group">
+                                                <label className="input-label" htmlFor="location">Location</label>
+                                                <div className="input-with-icon">
+                                                    <MapPin size={20} className="input-icon" />
+                                                    <input
+                                                        type="text"
+                                                        id="location"
+                                                        name="location"
+                                                        className={`input input-icon-left ${errors.location ? 'input-error' : ''}`}
+                                                        placeholder="City, State/Province"
+                                                        value={formData.location}
+                                                        onChange={handleChange}
+                                                    />
+                                                </div>
+                                                {errors.location && <span className="input-error-text">{errors.location}</span>}
+                                            </div>
+                                        </>
+                                    )}
 
                                     <div className="form-row">
                                         <div className="input-group">
