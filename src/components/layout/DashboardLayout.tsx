@@ -20,7 +20,10 @@ import {
     User as UserIcon,
     Truck,
     Factory,
-    Store
+    Store,
+    Shield,
+    Users,
+    Activity
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './DashboardLayout.css';
@@ -41,6 +44,12 @@ const allNavItems: NavItem[] = [
     { icon: <QrCode size={20} />, label: 'QR Codes', path: '/dashboard/qr' },
     { icon: <ScanLine size={20} />, label: 'QR Scanner', path: '/dashboard/qr/scan' },
     { icon: <BarChart3 size={20} />, label: 'Analytics', path: '/dashboard/analytics', roles: ['ADMIN'] },
+];
+
+const adminNavItems: NavItem[] = [
+    { icon: <Shield size={20} />, label: 'Admin Dashboard', path: '/dashboard/admin' },
+    { icon: <Users size={20} />, label: 'Users', path: '/dashboard/admin/users' },
+    { icon: <Activity size={20} />, label: 'Activity', path: '/dashboard/admin/activity' },
 ];
 
 // Role-specific labels, icons and colors for clear identification
@@ -64,10 +73,13 @@ const DashboardLayout = () => {
     const userRole = user?.role?.toUpperCase() || 'USER';
 
     // Filter nav items based on user role
-    const navItems = allNavItems.filter(item => {
-        if (!item.roles || item.roles.length === 0) return true;
-        return item.roles.includes(userRole);
-    });
+    // Admin users don't see main menu items - they only use admin section
+    const navItems = userRole === 'ADMIN'
+        ? []
+        : allNavItems.filter(item => {
+            if (!item.roles || item.roles.length === 0) return true;
+            return item.roles.includes(userRole);
+        });
 
     // Role display info
     const displayName = user?.name || 'User';
@@ -130,6 +142,24 @@ const DashboardLayout = () => {
                             </Link>
                         ))}
                     </div>
+
+                    {/* Admin Section - Only for ADMIN role */}
+                    {userRole === 'ADMIN' && (
+                        <div className="sidebar-section mt-8">
+                            <span className="sidebar-section-title" style={{ color: '#ef4444' }}>Admin</span>
+                            {adminNavItems.map((item) => (
+                                <Link
+                                    key={item.path}
+                                    to={item.path}
+                                    className={`sidebar-link ${isActive(item.path) ? 'active' : ''}`}
+                                    onClick={() => setSidebarOpen(false)}
+                                >
+                                    {item.icon}
+                                    <span>{item.label}</span>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
 
                     <div className="sidebar-section mt-8">
                         <span className="sidebar-section-title">Settings</span>

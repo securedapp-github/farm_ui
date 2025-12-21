@@ -26,6 +26,11 @@ import EventsPage from './pages/dashboard/EventsPage';
 import AnalyticsPage from './pages/dashboard/AnalyticsPage';
 import ProfilePage from './pages/dashboard/ProfilePage';
 
+// Admin Pages
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UsersPage from './pages/admin/UsersPage';
+import ActivityPage from './pages/admin/ActivityPage';
+
 function App() {
   return (
     <AuthProvider>
@@ -55,10 +60,15 @@ function App() {
             <Route path="qr" element={<QRManagementPage />} />
             <Route path="qr/scan" element={<QRScannerPage />} />
 
-            {/* Placeholder routes - using DashboardHome as fallback */}
+            {/* Other routes */}
             <Route path="events" element={<EventsPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="profile" element={<ProfilePage />} />
+
+            {/* Admin Routes */}
+            <Route path="admin" element={<AdminDashboard />} />
+            <Route path="admin/users" element={<UsersPage />} />
+            <Route path="admin/activity" element={<ActivityPage />} />
           </Route>
 
           {/* Fallback */}

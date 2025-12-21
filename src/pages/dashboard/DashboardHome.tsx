@@ -1,5 +1,5 @@
 import { useState, useEffect, type JSX } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import {
     Package,
     TrendingUp,
@@ -107,6 +107,12 @@ interface ActivityItem {
 
 const DashboardHome = () => {
     const { user } = useAuth();
+
+    // Redirect admin users to admin dashboard
+    if (user?.role?.toUpperCase() === 'ADMIN') {
+        return <Navigate to="/dashboard/admin" replace />;
+    }
+
     const [isLoading, setIsLoading] = useState(true);
     const [stats, setStats] = useState<DashboardStats>({ totalBatches: 0, qrScans: 0, verificationRate: 0 });
     const [recentBatches, setRecentBatches] = useState<RecentBatch[]>([]);
